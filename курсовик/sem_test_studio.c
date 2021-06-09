@@ -32,13 +32,13 @@ void* user1_turn(struct game_info* g_i)
 	int step1 = 0;
 	while (step1 < g_i[0].R)
 	{
+		sem_set_state(g_i[0].sem_id, 0, LOCK);
 		int local;
 		printf("Enter the number between 1-3\n");
 		scanf("%d", &local);
 		printf("local_user1=%d\n", local);
 		g_i[0].s_temp_arr[0] = local;
 		step1++;
-		sem_set_state(g_i[0].sem_id, 0, LOCK);
 		sem_set_state(g_i[0].sem_id, 1, UNLOCK);
 	}
 }
@@ -48,13 +48,13 @@ void* user2_turn(struct game_info* g_i)
 	int step2 = 0;
 	while (step2 < g_i[0].R)
 	{
+		sem_set_state(g_i[0].sem_id, 1, LOCK);
 		int local;
 		printf("Enter the number between 1-3\n");
 		scanf("%d", &local);
 		printf("local_user2=%d\n", local);
 		g_i[0].s_temp_arr[1] = local;
 		step2++;
-		sem_set_state(g_i[0].sem_id, 1, LOCK);
 		sem_set_state(g_i[0].sem_id, 2, UNLOCK);
 	}
 }
@@ -64,6 +64,7 @@ void* master_turn(struct game_info* g_i)
 	int step3 = 0;
 	while (step3 < g_i[0].R)
 	{
+		sem_set_state(g_i[0].sem_id, 2, LOCK);
 		g_i[0].s_arr[0] += g_i[0].s_temp_arr[0] + g_i[0].s_temp_arr[1];
 		g_i[0].s_temp_arr[0] = g_i[0].s_temp_arr[1] = 0;
 		printf("s0 = %d\n", g_i[0].s_arr[0]);
@@ -79,7 +80,6 @@ void* master_turn(struct game_info* g_i)
 			g_i[0].s_arr[2] -= g_i[0].s_arr[0];
 		}
         step3++;		
-		sem_set_state(g_i[0].sem_id, 2, LOCK);
 		sem_set_state(g_i[0].sem_id, 0, UNLOCK);
 	}
 }
