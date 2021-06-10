@@ -116,7 +116,7 @@ void print_help_and_exit()
     printf("========================= REQUIRED INPUT =========================\n");
     printf("| <R> == To start game with any port and R rounds                |\n");
     printf("| <port> <round_num> == To start with selected port and R rounds |\n");
-    printf("| The correct range of the R is from 2 to 1000                   |\n");
+    printf("| The correct range of the R is from 1 to 1000                   |\n");
     printf("==================================================================\n");
     exit(0);
 }
@@ -461,7 +461,7 @@ int main(int argc, char* argv[])
     else if (argc == 3)
         master_info.round_num = atoi(argv[2]);
 
-    if ((master_info.round_num < 2) || (master_info.round_num > 1000))
+    if ((master_info.round_num < 1) || (master_info.round_num > 1000))
         print_help_and_exit();
 
     master_info.sem_id = semget(IPC_PRIVATE, 2, 0600 | IPC_CREAT);
