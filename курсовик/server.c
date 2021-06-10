@@ -4,6 +4,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "pthread.h"
+#include "signal.h"
 #include "sys/types.h"
 #include "sys/socket.h"
 #include "sys/sem.h"
@@ -121,9 +122,20 @@ void print_help_and_exit()
     exit(0);
 }
 
+void signal_handler(int nsig)
+{
+	if (nsig == SIGINT)
+	{
+		semctl(sem_id, 0, IPC_RMID, 0);
+		exit(0);
+	}
+}
+
 void* master_turns_thread(void* master_struct)
 {
-    thread_master_info* master_info = (thread_player_info*) master_struct;
+    signal(SIGINT, signal_handler);
+	
+	thread_master_info* master_info = (thread_player_info*) master_struct;
     server_answer serv_answ;
 
     sem_set_state(master_info->sem_id, MASTER_ID, LOCK);
@@ -249,7 +261,9 @@ void* master_turns_thread(void* master_struct)
 
 void* user_turns_thread(void* master_struct)
 {
-    thread_master_info* master_info = (thread_player_info*) master_struct;
+    signal(SIGINT, signal_handler);
+	
+	thread_master_info* master_info = (thread_player_info*) master_struct;
     server_answer serv_answ = SERVER_ERROR;
 
     int step = 0;
@@ -346,7 +360,9 @@ void* user_turns_thread(void* master_struct)
 
 int main(int argc, char* argv[])
 {
-    u_int16_t server_port;
+    signal(SIGINT, signal_handler);
+	
+	u_int16_t server_port;
 
     if (argc == 2)
         server_port = 0;
